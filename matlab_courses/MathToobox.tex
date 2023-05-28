@@ -1,0 +1,98 @@
+% This LaTeX was auto-generated from MATLAB code.
+% To make changes, update the MATLAB code and export to LaTeX again.
+
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{epstopdf}
+\usepackage[table]{xcolor}
+\usepackage{matlab}
+
+\sloppy
+\epstopdfsetup{outdir=./}
+\graphicspath{ {./MathToobox_images/} }
+
+\begin{document}
+
+\begin{par}
+\begin{flushleft}
+Find the \textbf{derivative }of $\frac{d}{\mathrm{dx}}\left(x^2 +\mathrm{sin}\left(2x^4 \right)+1\right)$using the chain rule
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+syms x
+diff(x^2+sin(2*x^4)+1,x)
+\end{matlabcode}
+\begin{matlabsymbolicoutput}
+ans = 
+    $\displaystyle 2\,x+8\,x^3 \,\cos \left(2\,x^4 \right)$
+\end{matlabsymbolicoutput}
+
+
+\begin{par}
+\begin{flushleft}
+\textbf{Integrate} and\textbf{ plot} $\int {\left(\frac{t+1}{t}\right)}^2 \mathrm{dt}$
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+syms t
+int(((t+1)/t)^2,t)
+\end{matlabcode}
+\begin{matlabsymbolicoutput}
+ans = 
+    $\displaystyle t+2\,\log \left(t\right)-\frac{1}{t}$
+\end{matlabsymbolicoutput}
+\begin{matlabcode}
+fplot(ans)
+\end{matlabcode}
+\begin{center}
+\includegraphics[width=\maxwidth{56.196688409433015em}]{figure_0}
+\end{center}
+
+
+\begin{par}
+\begin{flushleft}
+Compute the\textbf{ Fourier Transform} $F\left(w\right)=c\int_{-\infty }^{\infty } f\left(x\right)e^{\mathrm{iswx}} \mathrm{dx}$
+\end{flushleft}
+\end{par}
+
+\begin{par}
+\begin{flushleft}
+with respect to x at the evalution point w, with c=1 and s=-1.
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+fourier(exp(-x^2))
+\end{matlabcode}
+
+
+\begin{par}
+\begin{flushleft}
+Compute the\textbf{ Taylor Series} expansion of sin(x) at a=0
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+taylor(sin(x),'Order',8)
+\end{matlabcode}
+
+\begin{par}
+$${\mathrm{limit}}_{n\longrightarrow +\infty } \frac{\sqrt{n^2 +10}}{n}=1$$
+\end{par}
+
+
+\begin{matlabcode}
+\end{matlabcode}
+
+\end{document}
