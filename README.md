@@ -1,8 +1,8 @@
-# MATLAB_Taturioal_and_Exercise
+# MATLAB_Tutorials_and_Exercise
 
 Written by: Dodge(Lang HE) asdsay@gmail.com Updated date: 2023-06-04
-Just some Taturioals and some exercises while I am teaching and studying MATLAB.
-All taturioals are originally written by me, but some exercises are not. I will mark the resource reference as many as I can.
+Just some Tutorials and some exercises while I am teaching and studying MATLAB.
+All tutorials are originally written by me, but some exercises are not. I will mark the resource reference as many as I can.
 
 
 
@@ -12,7 +12,7 @@ All taturioals are originally written by me, but some exercises are not. I will 
 
 ┃ ┠━━ **matlab_courses**/
 
-┃ ┃ ┠━━...(Taturioals)
+┃ ┃ ┠━━...(tutorials)
 
 ┃ ┠━━ **image_processing**/
 
@@ -54,7 +54,7 @@ All taturioals are originally written by me, but some exercises are not. I will 
 
 
 
-Taturioals are saved in folder **matlab_courses**.
+Tutorials are saved in folder **matlab_courses**.
 Since I mainly work on image and signal processing, I have two folders for them.
 And also there are others in **others**.
 
