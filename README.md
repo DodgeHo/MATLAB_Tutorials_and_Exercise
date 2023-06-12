@@ -4,8 +4,6 @@ Written by: Dodge(Lang HE) asdsay@gmail.com Updated date: 2023-06-04
 Just some Tutorials and some exercises while I am teaching and studying MATLAB.
 All tutorials are originally written by me, but some exercises are not. I will mark the resource reference as many as I can.
 
-
-
 **The directory tree is**
 
 ┠━━**MATLAB_Taturioal_and_Exercise**/  
@@ -15,6 +13,10 @@ All tutorials are originally written by me, but some exercises are not. I will m
 ┃ ┃ ┠━━...(tutorials)
 
 ┃ ┠━━ **image_processing**/
+
+┃ ┃ ┠━━MetalArtifactsCT/
+
+                (The elimination of artifacts depends on the linear interpolation method, which requires the radon transformation result of the metal, and the randon variation of the polymetal is the set of multiple sinusoidal lines.)
 
 ┃ ┃ ┠━━Pseudo-color generation/
 
@@ -47,12 +49,6 @@ All tutorials are originally written by me, but some exercises are not. I will m
 ┃ ┃ ┠━━StockVaR_and_MonteCarlo.m
 
                 (VaR was calculated by Monte Carlo simulation method)
-
-
-
-
-
-
 
 Tutorials are saved in folder **matlab_courses**.
 Since I mainly work on image and signal processing, I have two folders for them.
