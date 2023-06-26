@@ -1,8 +1,17 @@
 # MATLAB_Tutorials_and_Exercise
 
-Written by: Dodge(Lang HE) asdsay@gmail.com Updated date: 2023-06-04
+Written by: Dodge(Lang HE) asdsay@gmail.com 
+
+Updated date: 2023-06-13
+
 Just some Tutorials and some exercises while I am teaching and studying MATLAB.
 All tutorials are originally written by me, but some exercises are not. I will mark the resource reference as many as I can.
+
+Tutorials are saved in folder **matlab_courses**.
+Since I mainly work on image and signal processing, I have two folders for them.
+And also there are others in **others**.
+
+I will give more details in future, if I upload more files.
 
 **The directory tree is**
 
@@ -13,6 +22,10 @@ All tutorials are originally written by me, but some exercises are not. I will m
 ┃ ┃ ┠━━...(tutorials)
 
 ┃ ┠━━ **image_processing**/
+
+┃ ┃ ┠━━CellImageSegment/
+
+                (Take an image of cells. Devide each cell sement, and count the size / numbers of different-coloured chromosome. )
 
 ┃ ┃ ┠━━MetalArtifactsCT/
 
@@ -49,9 +62,3 @@ All tutorials are originally written by me, but some exercises are not. I will m
 ┃ ┃ ┠━━StockVaR_and_MonteCarlo.m
 
                 (VaR was calculated by Monte Carlo simulation method)
-
-Tutorials are saved in folder **matlab_courses**.
-Since I mainly work on image and signal processing, I have two folders for them.
-And also there are others in **others**.
-
-I will give more details in future, if I upload more files.
