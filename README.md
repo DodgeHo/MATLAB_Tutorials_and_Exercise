@@ -35,6 +35,10 @@ I will give more details in future, if I upload more files.
 
                 (Draw a gray picture in pseudo-color by matlab)
 
+┃ ┃ ┠━━VisualCryptographyicScheme/
+
+                (To solve the problem of pixel expansion a(3,3) visual cryptographyic scheme without pixel expansion is proposed, in which the generated shares have the same size as the original secret image.)
+
 ┃ ┃ ┠━━WatermarkAttackAnalysis/
 
                 (A simulation experiment that we try to refetch the Watermark from the picture which we insert the water mark, but under different kinds of attacktion, like white noise, rotation, etc.)
