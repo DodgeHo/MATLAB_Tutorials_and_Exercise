@@ -1,0 +1,3 @@
+1. Implement the SMESAnalysis function. This function takes a time series as input and calculates the following seven values: Inoise, Isignal, Pnoise, Psignal, enoise, SNR, and DC. It also plots a histogram, marking the fitted bimodal Gaussian curve and Inoise/Isignal. The function call and its return results are shown in the figure below.
+
+2. Upon analysis of the data from 25 RealTimeRecords, each record has only one channel exhibiting Cyclostationary processes periodically. Therefore, it is necessary to identify this channel and analyze it separately. This analysis is completed in two steps. The partial results preview is shown below.
