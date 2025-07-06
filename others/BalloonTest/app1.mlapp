@@ -1,0 +1,708 @@
+classdef app1 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure                        matlab.ui.Figure
+        Subject_Decision_Title_Field    matlab.ui.control.EditField
+        Balloon_Status_Title_Field      matlab.ui.control.EditField
+        Panel_Balloon_Status            matlab.ui.container.Panel
+        Label_Current_Balloon_Status_Label  matlab.ui.control.Label
+        Label_Current_Balloon_Status_Field  matlab.ui.control.EditField
+        Image_Balloon                   matlab.ui.control.Image
+        Label_Balloon_Serial_Label      matlab.ui.control.Label
+        Label_Balloon_Serial_Field      matlab.ui.control.EditField
+        Label_Inflate_Serial_Label      matlab.ui.control.Label
+        Label_Inflate_Serial_Field      matlab.ui.control.EditField
+        Button_Output_Results           matlab.ui.control.Button
+        Panel_Subject_Decision_Input    matlab.ui.container.Panel
+        Button_Submit_Decision          matlab.ui.control.Button
+        Button_Decision_15              matlab.ui.control.Button
+        Button_Decision_14              matlab.ui.control.Button
+        Button_Decision_13              matlab.ui.control.Button
+        Button_Decision_12              matlab.ui.control.Button
+        Button_Decision_11              matlab.ui.control.Button
+        Button_Decision_10              matlab.ui.control.Button
+        Button_Decision_9               matlab.ui.control.Button
+        Button_Decision_8               matlab.ui.control.Button
+        Button_Decision_7               matlab.ui.control.Button
+        Button_Decision_6               matlab.ui.control.Button
+        Button_Decision_5               matlab.ui.control.Button
+        Button_Decision_Stop            matlab.ui.control.Button
+        Panel_Total_Benefits            matlab.ui.container.Panel
+        Total_Benefits_Number_Field     matlab.ui.control.NumericEditField
+        Label_11                        matlab.ui.control.Label
+        Panel_Last_Balloon              matlab.ui.container.Panel
+        Accumulative_Balloon_Benefits_Field  matlab.ui.control.NumericEditField
+        Label_10                        matlab.ui.control.Label
+        Exact_Explosion_Point_Field     matlab.ui.control.NumericEditField
+        Label_9                         matlab.ui.control.Label
+        Accumulative_Inflate_Field      matlab.ui.control.NumericEditField
+        Label_8                         matlab.ui.control.Label
+        Label_Last_Balloon              matlab.ui.control.Label
+        Panel_Current_Balloon           matlab.ui.container.Panel
+        Current_Balloon_Benefits_Field  matlab.ui.control.NumericEditField
+        Label_6                         matlab.ui.control.Label
+        Current_Balloon_Total_Inflate_Field  matlab.ui.control.NumericEditField
+        Label_5                         matlab.ui.control.Label
+        This_Inflate_Field              matlab.ui.control.NumericEditField
+        Label_4                         matlab.ui.control.Label
+        Label_Current_Balloon           matlab.ui.control.Label
+        WhiteScreenPanel                matlab.ui.container.Panel % 白屏面板
+    end
+
+
+    properties (Access = private)
+        cellnum=1;
+        playnum=1;
+
+        inflat_volume_current=nan;
+        inflat_volume_accumulate=0;
+        randomNumbers
+
+        explosion=0;
+
+        volrate=0.5;
+        datasheet2=[];
+        decisionTimer % 定时器，用于控制 5 秒计时
+        originalBackgroundColor % 保存原始背景颜色
+    end
+
+    methods (Access = private)
+        function imgPath = getAppImagePath(app, imageName)
+            % 获取当前app的完整路径
+            fullPath = mfilename('fullpath');
+
+            % 获取包含当前app文件的目录
+            [appDir, ~, ~] = fileparts(fullPath);
+
+            % 构建新的图片路径
+            imgPath = fullfile(appDir, imageName);
+        end
+
+        function showBlankScreen(app, duration)
+            % 显示白屏
+            app.WhiteScreenPanel.Visible = 'on'; % 显示白屏面板
+            uistack(app.WhiteScreenPanel, 'top'); % 临时将白屏置顶
+            pause(duration); % 停留指定时间
+            app.WhiteScreenPanel.Visible = 'off'; % 隐藏白屏面板
+            uistack(app.WhiteScreenPanel, 'bottom'); % 恢复白屏到底层
+        end
+
+        function showExplosionEffect(app)
+            % 动态爆炸效果
+            explosionImages = {'爆炸1.png', '爆炸2.png', '爆炸3.png'};
+            for i = 1:length(explosionImages)
+                app.Image_Balloon.ImageSource = getAppImagePath(app, explosionImages{i});
+                pause(0.1); % 每帧停留 0.1 秒
+            end
+        end
+
+        function startDecisionTimer(app)
+            % 开始 5 秒计时器
+            app.decisionTimer = timer(...
+                'ExecutionMode', 'singleShot', ...
+                'StartDelay', 5, ...
+                'TimerFcn', @(~, ~) app.handleTimeout());
+            start(app.decisionTimer);
+        end
+
+        function handleTimeout(app)
+            % 处理 5 秒超时逻辑
+            if isnan(app.inflat_volume_current)
+                % 如果用户未决策，直接进入下一个气球
+                app.Button_Decision_StopPushed();
+            end
+        end
+
+        function updata(app)
+%             disp(app.datasheet2)
+%  气球数 次数  当前充气量，累计充气量，时间，气球状态，
+            app.datasheet2=[app.datasheet2;app.cellnum,app.playnum,app.inflat_volume_current,app.inflat_volume_accumulate,toc,app.explosion];
+
+        end
+    end
+
+    methods (Access = public)
+
+        function setRandomNumbers(app, data)
+            app.randomNumbers = data;
+        end
+
+
+    end
+
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: Button_Decision_Stop
+        function Button_Decision_StopPushed(app, event)
+            % 停止计时器
+            stop(app.decisionTimer);
+
+            if app.cellnum<=20
+                
+                app.Accumulative_Inflate_Field.Value=app.inflat_volume_accumulate;
+                app.Accumulative_Balloon_Benefits_Field.Value=app.volrate*app.inflat_volume_accumulate;
+                app.Exact_Explosion_Point_Field.Value=app.randomNumbers(app.cellnum);
+                app.Total_Benefits_Number_Field.Value=app.Total_Benefits_Number_Field.Value+app.volrate*app.inflat_volume_accumulate;
+                
+                app.cellnum=app.cellnum+1;
+                if app.cellnum<=20
+                    app.Label_Balloon_Serial_Label.Text=['第',num2str(app.cellnum),'个气球'];
+                    app.Label_Current_Balloon_Status_Label.Text={'未充气'};
+                end
+                app.playnum=1;
+                app.inflat_volume_current=nan;
+                app.inflat_volume_accumulate=0;
+                app.explosion=0;
+                app.Label_Inflate_Serial_Label.Text=['第',num2str(app.playnum),'次充气'];
+                app.This_Inflate_Field.Value=0;
+                app.Current_Balloon_Total_Inflate_Field.Value=app.inflat_volume_accumulate;
+                app.Current_Balloon_Benefits_Field.Value=app.volrate*app.Current_Balloon_Total_Inflate_Field.Value;
+                tic
+            else
+                uialert(app.UIFigure, '全部气球完成', '提示');
+            end
+
+            % 开始下一轮计时
+            startDecisionTimer(app);
+        end
+
+        % Button pushed function: Button_Decision_5
+        function Button_Decision_5Pushed(app, event)
+            app.inflat_volume_current=5;
+        end
+
+        % Button pushed function: Button_Decision_6
+        function Button_Decision_6Pushed(app, event)
+            app.inflat_volume_current=6;
+        end
+
+        % Button pushed function: Button_Decision_7
+        function Button_Decision_7Pushed(app, event)
+            app.inflat_volume_current=7;
+        end
+
+        % Button pushed function: Button_Decision_8
+        function Button_Decision_8Pushed(app, event)
+            app.inflat_volume_current=8;
+        end
+
+        % Button pushed function: Button_Decision_9
+        function Button_Decision_9Pushed(app, event)
+            app.inflat_volume_current=9;
+        end
+
+        % Button pushed function: Button_Decision_10
+        function Button_Decision_10Pushed(app, event)
+            app.inflat_volume_current=10;
+        end
+
+        % Button pushed function: Button_Decision_11
+        function Button_Decision_11Pushed(app, event)
+            app.inflat_volume_current=11;
+        end
+
+        % Button pushed function: Button_Decision_12
+        function Button_Decision_12Pushed(app, event)
+            app.inflat_volume_current=12;
+        end
+
+        % Button pushed function: Button_Decision_13
+        function Button_Decision_13Pushed(app, event)
+            app.inflat_volume_current=13;
+        end
+
+        % Button pushed function: Button_Decision_14
+        function Button_Decision_14Pushed(app, event)
+            app.inflat_volume_current=14;
+        end
+
+        % Button pushed function: Button_Decision_15
+        function Button_Decision_15Pushed(app, event)
+            app.inflat_volume_current=15;
+        end
+
+        % Button pushed function: Button_Submit_Decision
+        function Button_Submit_DecisionPushed(app, event)
+            % 停止计时器
+            stop(app.decisionTimer);
+
+            % 试次开始前显示空白屏
+            showBlankScreen(app, 0.001);
+
+            % 开始计时
+            startTime = tic;
+
+            if app.explosion == 1
+                % 如果app.explosion为1，显示警告对话框并退出函数
+                uialert(app.UIFigure, '请停止！', '警告');
+                return; % 返回，不执行后面的代码
+            end
+            if app.cellnum<=20
+                % 检查app.inflat_volume_current是否是NaN
+                while toc(startTime) < 5
+                    % 如果在 5 秒内完成决策，退出循环
+                    if ~isnan(app.inflat_volume_current)
+                        break;
+                    end
+                end
+
+                % 如果超时未决策，显示警告
+                if isnan(app.inflat_volume_current)
+                    uialert(app.UIFigure, '决策超时', '警告');
+                    return;
+                end
+
+                if isnan(app.inflat_volume_current)
+                    % 如果是NaN，显示错误消息的弹窗
+                    uialert(app.UIFigure, '未选择充气量', '错误');
+                else
+
+                    app.Label_Inflate_Serial_Label.Text=['第',num2str(app.playnum),'次充气'];
+                    app.Label_Current_Balloon_Status_Label.Text='充气中';
+                    pause(0.1);
+                    app.inflat_volume_accumulate=app.inflat_volume_accumulate+app.inflat_volume_current;
+                    app.This_Inflate_Field.Value=app.inflat_volume_current;
+                    if app.inflat_volume_accumulate <= app.randomNumbers(app.cellnum)
+                        app.Current_Balloon_Total_Inflate_Field.Value=app.inflat_volume_accumulate;
+                        app.Current_Balloon_Benefits_Field.Value=app.volrate*app.Current_Balloon_Total_Inflate_Field.Value;
+                        app.Label_Current_Balloon_Status_Label.Text={'充气';'完成'};
+                        pause(0.1);
+                        updata(app)
+                        app.playnum=app.playnum+1;
+                        app.Label_Inflate_Serial_Label.Text=['第',num2str(app.playnum),'次充气'];
+                        app.Label_Current_Balloon_Status_Label.Text={'等待';'充气'};
+                        app.inflat_volume_current=nan;
+                        
+                        tic
+                    else
+                        
+                        
+                        
+                        app.Current_Balloon_Total_Inflate_Field.Value=app.inflat_volume_accumulate;
+                        app.Current_Balloon_Benefits_Field.Value=0;
+                        
+                        app.Label_Current_Balloon_Status_Label.Text={'已';'爆炸'};
+                        app.explosion=1;
+                        showExplosionEffect(app); % 动态爆炸效果
+                        showBlankScreen(app, 0.001); % 爆炸后空白屏
+
+                        updata(app)
+                        pause(1);
+                        if app.cellnum<=20
+                            app.Accumulative_Inflate_Field.Value=app.inflat_volume_accumulate;
+                            if app.explosion==1
+                                app.Accumulative_Balloon_Benefits_Field.Value=0;
+                            else
+                            app.Accumulative_Balloon_Benefits_Field.Value=app.volrate*app.inflat_volume_accumulate;
+                            end
+                            app.Exact_Explosion_Point_Field.Value=app.randomNumbers(app.cellnum);
+                            app.Total_Benefits_Number_Field.Value=app.Total_Benefits_Number_Field.Value+app.Accumulative_Balloon_Benefits_Field.Value;
+
+                            app.cellnum=app.cellnum+1;
+                            if app.cellnum<=20
+                                app.Label_Balloon_Serial_Label.Text=['第',num2str(app.cellnum),'个气球'];
+                                app.Label_Current_Balloon_Status_Label.Text={'未充气'};
+                            end
+                            app.playnum=1;
+                            app.inflat_volume_current=nan;
+                            app.inflat_volume_accumulate=0;
+                            app.explosion=0;
+                            app.Label_Inflate_Serial_Label.Text=['第',num2str(app.playnum),'次充气'];
+                            app.This_Inflate_Field.Value=0;
+                            app.Current_Balloon_Total_Inflate_Field.Value=app.inflat_volume_accumulate;
+                            app.Current_Balloon_Benefits_Field.Value=app.volrate*app.Current_Balloon_Total_Inflate_Field.Value;
+                            
+                            app.Image_Balloon.ImageSource = getAppImagePath(app, '原始气球.png');
+                            tic
+                        else
+                            uialert(app.UIFigure, '全部气球完成', '提示');
+                        end
+                    end
+                    
+                end
+            else
+                uialert(app.UIFigure, '全部气球完成', '提示');
+            end
+
+            % 试次结束后显示空白屏
+            showBlankScreen(app, 0.001);
+
+            % 开始下一轮计时
+            startDecisionTimer(app);
+        end
+
+        % Button pushed function: Button_Output_Results
+        function Button_Output_ResultsPushed(app, event)
+            % 获取要保存的数据
+            data = app.randomNumbers;
+            % 将数据转换为列向量
+            data = data(:);
+
+            % 提示用户选择保存文件夹
+            folder_name = uigetdir('', '请选择要保存文件的文件夹');
+
+            if folder_name == 0
+                % 如果用户取消选择文件夹，则不进行保存
+                return;
+            end
+
+            % 创建 Excel 文件
+            filename = fullfile(folder_name, strcat(datestr(datetime('now'), 'yyyy-mm-dd-HHMMSS'), '_data1.xlsx'));
+            xlswrite(filename, {'气球序号', '充气次数', '当前充气量', '累计充气量','运行时间','运行时间2','气球状态'}, 'Sheet2', 'A1:G1');
+
+            xlswrite(filename, app.datasheet2, 'Sheet2', 'A2');
+
+            % 写入数据到 Excel 文件
+            xlswrite(filename, [(1:numel(data))' data], 'Sheet1', 'A2');
+
+            xlswrite(filename, {'气球序号', '爆炸点'}, 'Sheet1', 'A1:B1');
+
+            % 提示保存成功
+            msgbox('数据已成功保存到 Excel 文件中。', '保存成功');
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Get the file path for locating images
+            pathToMLAPP = fileparts(mfilename('fullpath'));
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Color = [1 1 1];
+            app.UIFigure.Position = [100 100 838 584];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create WhiteScreenPanel (放在最开始创建，默认在底层)
+            app.WhiteScreenPanel = uipanel(app.UIFigure);
+            app.WhiteScreenPanel.BackgroundColor = [1 1 1]; % 白色背景
+            app.WhiteScreenPanel.Position = [0 0 app.UIFigure.Position(3) app.UIFigure.Position(4)];
+            app.WhiteScreenPanel.Visible = 'off'; % 默认隐藏
+            % 将白屏面板移到最底层
+            uistack(app.WhiteScreenPanel, 'bottom');
+
+            % Create Panel_Current_Balloon
+            app.Panel_Current_Balloon = uipanel(app.UIFigure);
+            app.Panel_Current_Balloon.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel_Current_Balloon.Position = [37 217 353 122];
+
+            % Create Label_Current_Balloon
+            app.Label_Current_Balloon = uilabel(app.Panel_Current_Balloon);
+            app.Label_Current_Balloon.FontSize = 20;
+            app.Label_Current_Balloon.Position = [8 28 25 72];
+            app.Label_Current_Balloon.Text = {'本'; '气'; '球'};
+
+            % Create Label_4
+            app.Label_4 = uilabel(app.Panel_Current_Balloon);
+            app.Label_4.HorizontalAlignment = 'right';
+            app.Label_4.FontSize = 20;
+            app.Label_4.Position = [73 83 105 26];
+            app.Label_4.Text = '本次充气量';
+
+            % Create This_Inflate_Field
+            app.This_Inflate_Field = uieditfield(app.Panel_Current_Balloon, 'numeric');
+            app.This_Inflate_Field.FontSize = 20;
+            app.This_Inflate_Field.Position = [193 83 88 26];
+
+            % Create Label_5
+            app.Label_5 = uilabel(app.Panel_Current_Balloon);
+            app.Label_5.HorizontalAlignment = 'right';
+            app.Label_5.FontSize = 20;
+            app.Label_5.Position = [73 44 105 26];
+            app.Label_5.Text = '累计充气量';
+
+            % Create Current_Balloon_Total_Inflate_Field
+            app.Current_Balloon_Total_Inflate_Field = uieditfield(app.Panel_Current_Balloon, 'numeric');
+            app.Current_Balloon_Total_Inflate_Field.FontSize = 20;
+            app.Current_Balloon_Total_Inflate_Field.Position = [193 44 88 26];
+
+            % Create Label_6
+            app.Label_6 = uilabel(app.Panel_Current_Balloon);
+            app.Label_6.HorizontalAlignment = 'right';
+            app.Label_6.FontSize = 20;
+            app.Label_6.Position = [53 6 125 26];
+            app.Label_6.Text = '累计临时收益';
+
+            % Create Current_Balloon_Benefits_Field
+            app.Current_Balloon_Benefits_Field = uieditfield(app.Panel_Current_Balloon, 'numeric');
+            app.Current_Balloon_Benefits_Field.FontSize = 20;
+            app.Current_Balloon_Benefits_Field.Position = [193 6 88 26];
+
+            % Create Panel_Last_Balloon
+            app.Panel_Last_Balloon = uipanel(app.UIFigure);
+            app.Panel_Last_Balloon.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel_Last_Balloon.Position = [36 90 354 123];
+
+            % Create Label_Last_Balloon
+            app.Label_Last_Balloon = uilabel(app.Panel_Last_Balloon);
+            app.Label_Last_Balloon.FontSize = 20;
+            app.Label_Last_Balloon.Position = [8 13 25 96];
+            app.Label_Last_Balloon.Text = {'上'; '个'; '气'; '球'};
+
+            % Create Label_8
+            app.Label_8 = uilabel(app.Panel_Last_Balloon);
+            app.Label_8.HorizontalAlignment = 'right';
+            app.Label_8.FontSize = 20;
+            app.Label_8.Position = [73 83 105 26];
+            app.Label_8.Text = '累计充气量';
+
+            % Create Accumulative_Inflate_Field
+            app.Accumulative_Inflate_Field = uieditfield(app.Panel_Last_Balloon, 'numeric');
+            app.Accumulative_Inflate_Field.FontSize = 20;
+            app.Accumulative_Inflate_Field.Position = [193 83 88 26];
+
+            % Create Label_9
+            app.Label_9 = uilabel(app.Panel_Last_Balloon);
+            app.Label_9.HorizontalAlignment = 'right';
+            app.Label_9.FontSize = 20;
+            app.Label_9.Position = [73 44 105 26];
+            app.Label_9.Text = '实际爆炸点';
+
+            % Create Exact_Explosion_Point_Field
+            app.Exact_Explosion_Point_Field = uieditfield(app.Panel_Last_Balloon, 'numeric');
+            app.Exact_Explosion_Point_Field.FontSize = 20;
+            app.Exact_Explosion_Point_Field.Position = [193 44 88 26];
+
+            % Create Label_10
+            app.Label_10 = uilabel(app.Panel_Last_Balloon);
+            app.Label_10.HorizontalAlignment = 'right';
+            app.Label_10.FontSize = 20;
+            app.Label_10.Position = [93 6 85 26];
+            app.Label_10.Text = '累计收益';
+
+            % Create Accumulative_Balloon_Benefits_Field
+            app.Accumulative_Balloon_Benefits_Field = uieditfield(app.Panel_Last_Balloon, 'numeric');
+            app.Accumulative_Balloon_Benefits_Field.FontSize = 20;
+            app.Accumulative_Balloon_Benefits_Field.Position = [193 6 88 26];
+
+            % Create Panel_Total_Benefits
+            app.Panel_Total_Benefits = uipanel(app.UIFigure);
+            app.Panel_Total_Benefits.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel_Total_Benefits.Position = [36 43 354 40];
+
+            % Create Label_11
+            app.Label_11 = uilabel(app.Panel_Total_Benefits);
+            app.Label_11.HorizontalAlignment = 'right';
+            app.Label_11.FontSize = 20;
+            app.Label_11.Position = [8 6 105 26];
+            app.Label_11.Text = '已有总收益';
+
+            % Create Total_Benefits_Number_Field
+            app.Total_Benefits_Number_Field = uieditfield(app.Panel_Total_Benefits, 'numeric');
+            app.Total_Benefits_Number_Field.FontSize = 20;
+            app.Total_Benefits_Number_Field.Position = [183 6 98 26];
+
+            % Create Panel_Subject_Decision_Input
+            app.Panel_Subject_Decision_Input = uipanel(app.UIFigure);
+            app.Panel_Subject_Decision_Input.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel_Subject_Decision_Input.Position = [422 67 379 436];
+
+            % Create Button_Decision_Stop
+            app.Button_Decision_Stop = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_Stop.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_StopPushed, true);
+            app.Button_Decision_Stop.FontSize = 20;
+            app.Button_Decision_Stop.Position = [39 331 84 69];
+            app.Button_Decision_Stop.Text = '停止';
+
+            % Create Button_Decision_5
+            app.Button_Decision_5 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_5.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_5Pushed, true);
+            app.Button_Decision_5.FontSize = 20;
+            app.Button_Decision_5.Position = [144 329 84 69];
+            app.Button_Decision_5.Text = '5';
+
+            % Create Button_Decision_6
+            app.Button_Decision_6 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_6.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_6Pushed, true);
+            app.Button_Decision_6.FontSize = 20;
+            app.Button_Decision_6.Position = [249 329 84 69];
+            app.Button_Decision_6.Text = '6';
+
+            % Create Button_Decision_7
+            app.Button_Decision_7 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_7.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_7Pushed, true);
+            app.Button_Decision_7.FontSize = 20;
+            app.Button_Decision_7.Position = [39 241 84 69];
+            app.Button_Decision_7.Text = '7';
+
+            % Create Button_Decision_8
+            app.Button_Decision_8 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_8.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_8Pushed, true);
+            app.Button_Decision_8.FontSize = 20;
+            app.Button_Decision_8.Position = [144 241 84 69];
+            app.Button_Decision_8.Text = '8';
+
+            % Create Button_Decision_9
+            app.Button_Decision_9 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_9.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_9Pushed, true);
+            app.Button_Decision_9.FontSize = 20;
+            app.Button_Decision_9.Position = [249 241 84 69];
+            app.Button_Decision_9.Text = '9';
+
+            % Create Button_Decision_10
+            app.Button_Decision_10 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_10.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_10Pushed, true);
+            app.Button_Decision_10.FontSize = 20;
+            app.Button_Decision_10.Position = [39 156 84 69];
+            app.Button_Decision_10.Text = '10';
+
+            % Create Button_Decision_11
+            app.Button_Decision_11 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_11.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_11Pushed, true);
+            app.Button_Decision_11.FontSize = 20;
+            app.Button_Decision_11.Position = [144 156 84 69];
+            app.Button_Decision_11.Text = '11';
+
+            % Create Button_Decision_12
+            app.Button_Decision_12 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_12.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_12Pushed, true);
+            app.Button_Decision_12.FontSize = 20;
+            app.Button_Decision_12.Position = [249 156 84 69];
+            app.Button_Decision_12.Text = '12';
+
+            % Create Button_Decision_13
+            app.Button_Decision_13 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_13.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_13Pushed, true);
+            app.Button_Decision_13.FontSize = 20;
+            app.Button_Decision_13.Position = [39 70 84 69];
+            app.Button_Decision_13.Text = '13';
+
+            % Create Button_Decision_14
+            app.Button_Decision_14 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_14.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_14Pushed, true);
+            app.Button_Decision_14.FontSize = 20;
+            app.Button_Decision_14.Position = [144 70 84 69];
+            app.Button_Decision_14.Text = '14';
+
+            % Create Button_Decision_15
+            app.Button_Decision_15 = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Decision_15.ButtonPushedFcn = createCallbackFcn(app, @Button_Decision_15Pushed, true);
+            app.Button_Decision_15.FontSize = 20;
+            app.Button_Decision_15.Position = [249 70 84 69];
+            app.Button_Decision_15.Text = '15';
+
+            % Create Button_Submit_Decision
+            app.Button_Submit_Decision = uibutton(app.Panel_Subject_Decision_Input, 'push');
+            app.Button_Submit_Decision.ButtonPushedFcn = createCallbackFcn(app, @Button_Submit_DecisionPushed, true);
+            app.Button_Submit_Decision.BackgroundColor = [0.8902 0.9882 1];
+            app.Button_Submit_Decision.FontSize = 20;
+            app.Button_Submit_Decision.Position = [121 7 131 48];
+            app.Button_Submit_Decision.Text = '确认并提交';
+
+            % Create Button_Output_Results
+            app.Button_Output_Results = uibutton(app.UIFigure, 'push');
+            app.Button_Output_Results.ButtonPushedFcn = createCallbackFcn(app, @Button_Output_ResultsPushed, true);
+            app.Button_Output_Results.BackgroundColor = [0.8902 0.9882 1];
+            app.Button_Output_Results.FontSize = 20;
+            app.Button_Output_Results.Position = [688 20 112 48];
+            app.Button_Output_Results.Text = '输出结果';
+
+            % Create Panel_Balloon_Status
+            app.Panel_Balloon_Status = uipanel(app.UIFigure);
+            app.Panel_Balloon_Status.Position = [36 345 355 158];
+
+            % Create Label_Inflate_Serial_Field
+            app.Label_Inflate_Serial_Field = uieditfield(app.Panel_Balloon_Status, 'text');
+            app.Label_Inflate_Serial_Field.BackgroundColor = [0.8 0.8 0.8];
+            app.Label_Inflate_Serial_Field.Position = [10 5 137 61];
+
+            % Create Label_Inflate_Serial_Label
+            app.Label_Inflate_Serial_Label = uilabel(app.Panel_Balloon_Status);
+            app.Label_Inflate_Serial_Label.BackgroundColor = [0.8 0.8 0.8];
+            app.Label_Inflate_Serial_Label.FontSize = 20;
+            app.Label_Inflate_Serial_Label.Position = [15 10 124 44];
+            app.Label_Inflate_Serial_Label.Text = '第1次充气';
+
+            % Create Label_Balloon_Serial_Field
+            app.Label_Balloon_Serial_Field = uieditfield(app.Panel_Balloon_Status, 'text');
+            app.Label_Balloon_Serial_Field.BackgroundColor = [0.8 0.8 0.8];
+            app.Label_Balloon_Serial_Field.Position = [10 74 137 61];
+
+            % Create Label_Balloon_Serial_Label
+            app.Label_Balloon_Serial_Label = uilabel(app.Panel_Balloon_Status);
+            app.Label_Balloon_Serial_Label.BackgroundColor = [0.8 0.8 0.8];
+            app.Label_Balloon_Serial_Label.FontSize = 20;
+            app.Label_Balloon_Serial_Label.Position = [15 82 124 44];
+            app.Label_Balloon_Serial_Label.Text = '第1个气球';
+
+            % Create Image_Balloon
+            app.Image_Balloon = uiimage(app.Panel_Balloon_Status);
+            app.Image_Balloon.Position = [145 9 111 117];
+            app.Image_Balloon.ImageSource = fullfile(pathToMLAPP, '原始气球.png');
+
+            % Create Label_Current_Balloon_Status_Field
+            app.Label_Current_Balloon_Status_Field = uieditfield(app.Panel_Balloon_Status, 'text');
+            app.Label_Current_Balloon_Status_Field.BackgroundColor = [0.8 0.8 0.8];
+            app.Label_Current_Balloon_Status_Field.Position = [245 27 99 82];
+
+            % Create Label_Current_Balloon_Status_Label
+            app.Label_Current_Balloon_Status_Label = uilabel(app.Panel_Balloon_Status);
+            app.Label_Current_Balloon_Status_Label.BackgroundColor = [0.8 0.8 0.8];
+            app.Label_Current_Balloon_Status_Label.FontSize = 20;
+            app.Label_Current_Balloon_Status_Label.Position = [255 32 79 69];
+            app.Label_Current_Balloon_Status_Label.Text = '未充气';
+
+            % Create Balloon_Status_Title_Field
+            app.Balloon_Status_Title_Field = uieditfield(app.UIFigure, 'text');
+            app.Balloon_Status_Title_Field.HorizontalAlignment = 'center';
+            app.Balloon_Status_Title_Field.FontSize = 20;
+            app.Balloon_Status_Title_Field.BackgroundColor = [0.8902 0.9882 1];
+            app.Balloon_Status_Title_Field.Position = [128 513 188 51];
+            app.Balloon_Status_Title_Field.Value = '气球状态';
+
+            % Create Subject_Decision_Title_Field
+            app.Subject_Decision_Title_Field = uieditfield(app.UIFigure, 'text');
+            app.Subject_Decision_Title_Field.HorizontalAlignment = 'center';
+            app.Subject_Decision_Title_Field.FontSize = 20;
+            app.Subject_Decision_Title_Field.BackgroundColor = [0.8902 0.9882 1];
+            app.Subject_Decision_Title_Field.Position = [514 513 188 51];
+            app.Subject_Decision_Title_Field.Value = '被试决策';
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = app1
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            % 程序启动时显示空白屏
+            showBlankScreen(app, 0.001);
+
+            % 开始第一次计时
+            startDecisionTimer(app);
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+            % 删除计时器
+            if isvalid(app.decisionTimer)
+                stop(app.decisionTimer);
+                delete(app.decisionTimer);
+            end
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end

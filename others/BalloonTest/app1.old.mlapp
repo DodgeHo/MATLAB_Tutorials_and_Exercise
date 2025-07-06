@@ -1,0 +1,620 @@
+classdef app1 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure      matlab.ui.Figure
+        EditField_14  matlab.ui.control.EditField
+        EditField_13  matlab.ui.control.EditField
+        Panel_5       matlab.ui.container.Panel
+        Label_2       matlab.ui.control.Label
+        EditField_12  matlab.ui.control.EditField
+        Image         matlab.ui.control.Image
+        Label         matlab.ui.control.Label
+        EditField_10  matlab.ui.control.EditField
+        Label_12      matlab.ui.control.Label
+        EditField_11  matlab.ui.control.EditField
+        Button_14     matlab.ui.control.Button
+        Panel_4       matlab.ui.container.Panel
+        Button_13     matlab.ui.control.Button
+        Button_12     matlab.ui.control.Button
+        Button_11     matlab.ui.control.Button
+        Button_10     matlab.ui.control.Button
+        Button_9      matlab.ui.control.Button
+        Button_8      matlab.ui.control.Button
+        Button_7      matlab.ui.control.Button
+        Button_6      matlab.ui.control.Button
+        Button_5      matlab.ui.control.Button
+        Button_4      matlab.ui.control.Button
+        Button_3      matlab.ui.control.Button
+        Button_2      matlab.ui.control.Button
+        Button        matlab.ui.control.Button
+        Panel_3       matlab.ui.container.Panel
+        EditField_9   matlab.ui.control.NumericEditField
+        Label_11      matlab.ui.control.Label
+        Panel_2       matlab.ui.container.Panel
+        EditField_6   matlab.ui.control.NumericEditField
+        Label_10      matlab.ui.control.Label
+        EditField_5   matlab.ui.control.NumericEditField
+        Label_9       matlab.ui.control.Label
+        EditField_4   matlab.ui.control.NumericEditField
+        Label_8       matlab.ui.control.Label
+        Label_7       matlab.ui.control.Label
+        Panel         matlab.ui.container.Panel
+        EditField_3   matlab.ui.control.NumericEditField
+        Label_6       matlab.ui.control.Label
+        EditField_2   matlab.ui.control.NumericEditField
+        Label_5       matlab.ui.control.Label
+        EditField     matlab.ui.control.NumericEditField
+        Label_4       matlab.ui.control.Label
+        Label_3       matlab.ui.control.Label
+    end
+
+
+    properties (Access = private)
+        cellnum=1;
+        playnum=1;
+
+        inflat_volume_current=nan;
+        inflat_volume_accumulate=0;
+        randomNumbers
+
+        explosion=0;
+
+        volrate=0.5;
+        datasheet2=[];
+    end
+
+    methods (Access = private)
+        function imgPath = getAppImagePath(app, imageName)
+            % 获取当前app的完整路径
+            fullPath = mfilename('fullpath');
+
+            % 获取包含当前app文件的目录
+            [appDir, ~, ~] = fileparts(fullPath);
+
+            % 构建新的图片路径
+            imgPath = fullfile(appDir, imageName);
+        end
+
+
+        
+        function updata(app)
+%             disp(app.datasheet2)
+%  气球数 次数  当前充气量，累计充气量，时间，气球状态，
+            app.datasheet2=[app.datasheet2;app.cellnum,app.playnum,app.inflat_volume_current,app.inflat_volume_accumulate,toc,app.explosion];
+
+        end
+    end
+
+    methods (Access = public)
+
+        function setRandomNumbers(app, data)
+            app.randomNumbers = data;
+        end
+
+
+    end
+
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: Button
+        function ButtonPushed(app, event)
+
+            if app.cellnum<=20
+                
+                app.EditField_4.Value=app.inflat_volume_accumulate;
+                app.EditField_6.Value=app.volrate*app.inflat_volume_accumulate;
+                app.EditField_5.Value=app.randomNumbers(app.cellnum);
+                app.EditField_9.Value=app.EditField_9.Value+app.volrate*app.inflat_volume_accumulate;
+                
+                app.cellnum=app.cellnum+1;
+                if app.cellnum<=20
+                    app.Label.Text=['第',num2str(app.cellnum),'个气球'];
+                    app.Label_2.Text={'未充气'};
+                end
+                app.playnum=1;
+                app.inflat_volume_current=nan;
+                app.inflat_volume_accumulate=0;
+                app.explosion=0;
+                app.Label_12.Text=['第',num2str(app.playnum),'次充气'];
+                app.EditField.Value=0;
+                app.EditField_2.Value=app.inflat_volume_accumulate;
+                app.EditField_3.Value=app.volrate*app.EditField_2.Value;
+                tic
+            else
+                uialert(app.UIFigure, '全部气球完成', '提示');
+            end
+
+        end
+
+        % Button pushed function: Button_2
+        function Button_2Pushed(app, event)
+            app.inflat_volume_current=5;
+        end
+
+        % Button pushed function: Button_3
+        function Button_3Pushed(app, event)
+            app.inflat_volume_current=6;
+        end
+
+        % Button pushed function: Button_4
+        function Button_4Pushed(app, event)
+            app.inflat_volume_current=7;
+        end
+
+        % Button pushed function: Button_5
+        function Button_5Pushed(app, event)
+            app.inflat_volume_current=8;
+        end
+
+        % Button pushed function: Button_6
+        function Button_6Pushed(app, event)
+            app.inflat_volume_current=9;
+        end
+
+        % Button pushed function: Button_7
+        function Button_7Pushed(app, event)
+            app.inflat_volume_current=10;
+        end
+
+        % Button pushed function: Button_8
+        function Button_8Pushed(app, event)
+            app.inflat_volume_current=11;
+        end
+
+        % Button pushed function: Button_9
+        function Button_9Pushed(app, event)
+            app.inflat_volume_current=12;
+        end
+
+        % Button pushed function: Button_10
+        function Button_10Pushed(app, event)
+            app.inflat_volume_current=13;
+        end
+
+        % Button pushed function: Button_11
+        function Button_11Pushed(app, event)
+            app.inflat_volume_current=14;
+        end
+
+        % Button pushed function: Button_12
+        function Button_12Pushed(app, event)
+            app.inflat_volume_current=15;
+        end
+
+        % Button pushed function: Button_13
+        function Button_13Pushed(app, event)
+            if app.explosion == 1
+                % 如果app.explosion为1，显示警告对话框并退出函数
+                uialert(app.UIFigure, '请停止！', '警告');
+                return; % 返回，不执行后面的代码
+            end
+            if app.cellnum<=20
+                % 检查app.inflat_volume_current是否是NaN
+                if isnan(app.inflat_volume_current)
+                    % 如果是NaN，显示错误消息的弹窗
+                    uialert(app.UIFigure, '未选择充气量', '错误');
+                else
+
+                    app.Label_12.Text=['第',num2str(app.playnum),'次充气'];
+                    app.Label_2.Text='充气中';
+                    pause(0.1);
+                    app.inflat_volume_accumulate=app.inflat_volume_accumulate+app.inflat_volume_current;
+                    app.EditField.Value=app.inflat_volume_current;
+                    if app.inflat_volume_accumulate <= app.randomNumbers(app.cellnum)
+                        app.EditField_2.Value=app.inflat_volume_accumulate;
+                        app.EditField_3.Value=app.volrate*app.EditField_2.Value;
+                        app.Label_2.Text={'充气';'完成'};
+                        pause(0.1);
+                        updata(app)
+                        app.playnum=app.playnum+1;
+                        app.Label_12.Text=['第',num2str(app.playnum),'次充气'];
+                        app.Label_2.Text={'等待';'充气'};
+                        app.inflat_volume_current=nan;
+                        
+                        tic
+                    else
+                        
+                        
+                        
+                        app.EditField_2.Value=app.inflat_volume_accumulate;
+                        app.EditField_3.Value=0;
+                        
+                        app.Label_2.Text={'已';'爆炸'};
+                        app.explosion=1;
+                        app.Image.ImageSource = getAppImagePath(app, '爆炸后.png');
+
+                        updata(app)
+                        pause(1);
+                        if app.cellnum<=20
+                            app.EditField_4.Value=app.inflat_volume_accumulate;
+                            if app.explosion==1
+                                app.EditField_6.Value=0;
+                            else
+                            app.EditField_6.Value=app.volrate*app.inflat_volume_accumulate;
+                            end
+                            app.EditField_5.Value=app.randomNumbers(app.cellnum);
+                            app.EditField_9.Value=app.EditField_9.Value+app.EditField_6.Value;
+
+                            app.cellnum=app.cellnum+1;
+                            if app.cellnum<=20
+                                app.Label.Text=['第',num2str(app.cellnum),'个气球'];
+                                app.Label_2.Text={'未充气'};
+                            end
+                            app.playnum=1;
+                            app.inflat_volume_current=nan;
+                            app.inflat_volume_accumulate=0;
+                            app.explosion=0;
+                            app.Label_12.Text=['第',num2str(app.playnum),'次充气'];
+                            app.EditField.Value=0;
+                            app.EditField_2.Value=app.inflat_volume_accumulate;
+                            app.EditField_3.Value=app.volrate*app.EditField_2.Value;
+                            
+                            app.Image.ImageSource = getAppImagePath(app, '原始气球.png');
+                            tic
+                        else
+                            uialert(app.UIFigure, '全部气球完成', '提示');
+                        end
+                    end
+                    
+                end
+            else
+                uialert(app.UIFigure, '全部气球完成', '提示');
+            end
+        end
+
+        % Button pushed function: Button_14
+        function Button_14Pushed(app, event)
+            % 获取要保存的数据
+            data = app.randomNumbers;
+            % 将数据转换为列向量
+            data = data(:);
+
+            % 提示用户选择保存文件夹
+            folder_name = uigetdir('', '请选择要保存文件的文件夹');
+
+            if folder_name == 0
+                % 如果用户取消选择文件夹，则不进行保存
+                return;
+            end
+
+            % 创建 Excel 文件
+            filename = fullfile(folder_name, strcat(datestr(datetime('now'), 'yyyy-mm-dd-HHMMSS'), '_data1.xlsx'));
+            xlswrite(filename, {'气球序号', '充气次数', '当前充气量', '累计充气量','运行时间','运行时间2','气球状态'}, 'Sheet2', 'A1:G1');
+
+            xlswrite(filename, app.datasheet2, 'Sheet2', 'A2');
+
+            % 写入数据到 Excel 文件
+            xlswrite(filename, [(1:numel(data))' data], 'Sheet1', 'A2');
+
+            xlswrite(filename, {'气球序号', '爆炸点'}, 'Sheet1', 'A1:B1');
+
+            % 提示保存成功
+            msgbox('数据已成功保存到 Excel 文件中。', '保存成功');
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Get the file path for locating images
+            pathToMLAPP = fileparts(mfilename('fullpath'));
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Color = [1 1 1];
+            app.UIFigure.Position = [100 100 838 584];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create Panel
+            app.Panel = uipanel(app.UIFigure);
+            app.Panel.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel.Position = [37 217 353 122];
+
+            % Create Label_3
+            app.Label_3 = uilabel(app.Panel);
+            app.Label_3.FontSize = 20;
+            app.Label_3.Position = [8 28 25 72];
+            app.Label_3.Text = {'本'; '气'; '球'};
+
+            % Create Label_4
+            app.Label_4 = uilabel(app.Panel);
+            app.Label_4.HorizontalAlignment = 'right';
+            app.Label_4.FontSize = 20;
+            app.Label_4.Position = [73 83 105 26];
+            app.Label_4.Text = '本次充气量';
+
+            % Create EditField
+            app.EditField = uieditfield(app.Panel, 'numeric');
+            app.EditField.FontSize = 20;
+            app.EditField.Position = [193 83 88 26];
+
+            % Create Label_5
+            app.Label_5 = uilabel(app.Panel);
+            app.Label_5.HorizontalAlignment = 'right';
+            app.Label_5.FontSize = 20;
+            app.Label_5.Position = [73 44 105 26];
+            app.Label_5.Text = '累计充气量';
+
+            % Create EditField_2
+            app.EditField_2 = uieditfield(app.Panel, 'numeric');
+            app.EditField_2.FontSize = 20;
+            app.EditField_2.Position = [193 44 88 26];
+
+            % Create Label_6
+            app.Label_6 = uilabel(app.Panel);
+            app.Label_6.HorizontalAlignment = 'right';
+            app.Label_6.FontSize = 20;
+            app.Label_6.Position = [53 6 125 26];
+            app.Label_6.Text = '累计临时收益';
+
+            % Create EditField_3
+            app.EditField_3 = uieditfield(app.Panel, 'numeric');
+            app.EditField_3.FontSize = 20;
+            app.EditField_3.Position = [193 6 88 26];
+
+            % Create Panel_2
+            app.Panel_2 = uipanel(app.UIFigure);
+            app.Panel_2.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel_2.Position = [36 90 354 123];
+
+            % Create Label_7
+            app.Label_7 = uilabel(app.Panel_2);
+            app.Label_7.FontSize = 20;
+            app.Label_7.Position = [8 13 25 96];
+            app.Label_7.Text = {'上'; '个'; '气'; '球'};
+
+            % Create Label_8
+            app.Label_8 = uilabel(app.Panel_2);
+            app.Label_8.HorizontalAlignment = 'right';
+            app.Label_8.FontSize = 20;
+            app.Label_8.Position = [73 83 105 26];
+            app.Label_8.Text = '累计充气量';
+
+            % Create EditField_4
+            app.EditField_4 = uieditfield(app.Panel_2, 'numeric');
+            app.EditField_4.FontSize = 20;
+            app.EditField_4.Position = [193 83 88 26];
+
+            % Create Label_9
+            app.Label_9 = uilabel(app.Panel_2);
+            app.Label_9.HorizontalAlignment = 'right';
+            app.Label_9.FontSize = 20;
+            app.Label_9.Position = [73 44 105 26];
+            app.Label_9.Text = '实际爆炸点';
+
+            % Create EditField_5
+            app.EditField_5 = uieditfield(app.Panel_2, 'numeric');
+            app.EditField_5.FontSize = 20;
+            app.EditField_5.Position = [193 44 88 26];
+
+            % Create Label_10
+            app.Label_10 = uilabel(app.Panel_2);
+            app.Label_10.HorizontalAlignment = 'right';
+            app.Label_10.FontSize = 20;
+            app.Label_10.Position = [93 6 85 26];
+            app.Label_10.Text = '累计收益';
+
+            % Create EditField_6
+            app.EditField_6 = uieditfield(app.Panel_2, 'numeric');
+            app.EditField_6.FontSize = 20;
+            app.EditField_6.Position = [193 6 88 26];
+
+            % Create Panel_3
+            app.Panel_3 = uipanel(app.UIFigure);
+            app.Panel_3.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel_3.Position = [36 43 354 40];
+
+            % Create Label_11
+            app.Label_11 = uilabel(app.Panel_3);
+            app.Label_11.HorizontalAlignment = 'right';
+            app.Label_11.FontSize = 20;
+            app.Label_11.Position = [8 6 105 26];
+            app.Label_11.Text = '已有总收益';
+
+            % Create EditField_9
+            app.EditField_9 = uieditfield(app.Panel_3, 'numeric');
+            app.EditField_9.FontSize = 20;
+            app.EditField_9.Position = [183 6 98 26];
+
+            % Create Panel_4
+            app.Panel_4 = uipanel(app.UIFigure);
+            app.Panel_4.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel_4.Position = [422 67 379 436];
+
+            % Create Button
+            app.Button = uibutton(app.Panel_4, 'push');
+            app.Button.ButtonPushedFcn = createCallbackFcn(app, @ButtonPushed, true);
+            app.Button.FontSize = 20;
+            app.Button.Position = [39 331 84 69];
+            app.Button.Text = '停止';
+
+            % Create Button_2
+            app.Button_2 = uibutton(app.Panel_4, 'push');
+            app.Button_2.ButtonPushedFcn = createCallbackFcn(app, @Button_2Pushed, true);
+            app.Button_2.FontSize = 20;
+            app.Button_2.Position = [144 329 84 69];
+            app.Button_2.Text = '5';
+
+            % Create Button_3
+            app.Button_3 = uibutton(app.Panel_4, 'push');
+            app.Button_3.ButtonPushedFcn = createCallbackFcn(app, @Button_3Pushed, true);
+            app.Button_3.FontSize = 20;
+            app.Button_3.Position = [249 329 84 69];
+            app.Button_3.Text = '6';
+
+            % Create Button_4
+            app.Button_4 = uibutton(app.Panel_4, 'push');
+            app.Button_4.ButtonPushedFcn = createCallbackFcn(app, @Button_4Pushed, true);
+            app.Button_4.FontSize = 20;
+            app.Button_4.Position = [39 241 84 69];
+            app.Button_4.Text = '7';
+
+            % Create Button_5
+            app.Button_5 = uibutton(app.Panel_4, 'push');
+            app.Button_5.ButtonPushedFcn = createCallbackFcn(app, @Button_5Pushed, true);
+            app.Button_5.FontSize = 20;
+            app.Button_5.Position = [144 241 84 69];
+            app.Button_5.Text = '8';
+
+            % Create Button_6
+            app.Button_6 = uibutton(app.Panel_4, 'push');
+            app.Button_6.ButtonPushedFcn = createCallbackFcn(app, @Button_6Pushed, true);
+            app.Button_6.FontSize = 20;
+            app.Button_6.Position = [249 241 84 69];
+            app.Button_6.Text = '9';
+
+            % Create Button_7
+            app.Button_7 = uibutton(app.Panel_4, 'push');
+            app.Button_7.ButtonPushedFcn = createCallbackFcn(app, @Button_7Pushed, true);
+            app.Button_7.FontSize = 20;
+            app.Button_7.Position = [39 156 84 69];
+            app.Button_7.Text = '10';
+
+            % Create Button_8
+            app.Button_8 = uibutton(app.Panel_4, 'push');
+            app.Button_8.ButtonPushedFcn = createCallbackFcn(app, @Button_8Pushed, true);
+            app.Button_8.FontSize = 20;
+            app.Button_8.Position = [144 156 84 69];
+            app.Button_8.Text = '11';
+
+            % Create Button_9
+            app.Button_9 = uibutton(app.Panel_4, 'push');
+            app.Button_9.ButtonPushedFcn = createCallbackFcn(app, @Button_9Pushed, true);
+            app.Button_9.FontSize = 20;
+            app.Button_9.Position = [249 156 84 69];
+            app.Button_9.Text = '12';
+
+            % Create Button_10
+            app.Button_10 = uibutton(app.Panel_4, 'push');
+            app.Button_10.ButtonPushedFcn = createCallbackFcn(app, @Button_10Pushed, true);
+            app.Button_10.FontSize = 20;
+            app.Button_10.Position = [39 70 84 69];
+            app.Button_10.Text = '13';
+
+            % Create Button_11
+            app.Button_11 = uibutton(app.Panel_4, 'push');
+            app.Button_11.ButtonPushedFcn = createCallbackFcn(app, @Button_11Pushed, true);
+            app.Button_11.FontSize = 20;
+            app.Button_11.Position = [144 70 84 69];
+            app.Button_11.Text = '14';
+
+            % Create Button_12
+            app.Button_12 = uibutton(app.Panel_4, 'push');
+            app.Button_12.ButtonPushedFcn = createCallbackFcn(app, @Button_12Pushed, true);
+            app.Button_12.FontSize = 20;
+            app.Button_12.Position = [249 70 84 69];
+            app.Button_12.Text = '15';
+
+            % Create Button_13
+            app.Button_13 = uibutton(app.Panel_4, 'push');
+            app.Button_13.ButtonPushedFcn = createCallbackFcn(app, @Button_13Pushed, true);
+            app.Button_13.BackgroundColor = [0.8902 0.9882 1];
+            app.Button_13.FontSize = 20;
+            app.Button_13.Position = [121 7 131 48];
+            app.Button_13.Text = '确认并提交';
+
+            % Create Button_14
+            app.Button_14 = uibutton(app.UIFigure, 'push');
+            app.Button_14.ButtonPushedFcn = createCallbackFcn(app, @Button_14Pushed, true);
+            app.Button_14.BackgroundColor = [0.8902 0.9882 1];
+            app.Button_14.FontSize = 20;
+            app.Button_14.Position = [688 20 112 48];
+            app.Button_14.Text = '输出结果';
+
+            % Create Panel_5
+            app.Panel_5 = uipanel(app.UIFigure);
+            app.Panel_5.Position = [36 345 355 158];
+
+            % Create EditField_11
+            app.EditField_11 = uieditfield(app.Panel_5, 'text');
+            app.EditField_11.BackgroundColor = [0.8 0.8 0.8];
+            app.EditField_11.Position = [10 5 137 61];
+
+            % Create Label_12
+            app.Label_12 = uilabel(app.Panel_5);
+            app.Label_12.BackgroundColor = [0.8 0.8 0.8];
+            app.Label_12.FontSize = 20;
+            app.Label_12.Position = [15 10 124 44];
+            app.Label_12.Text = '第1次充气';
+
+            % Create EditField_10
+            app.EditField_10 = uieditfield(app.Panel_5, 'text');
+            app.EditField_10.BackgroundColor = [0.8 0.8 0.8];
+            app.EditField_10.Position = [10 74 137 61];
+
+            % Create Label
+            app.Label = uilabel(app.Panel_5);
+            app.Label.BackgroundColor = [0.8 0.8 0.8];
+            app.Label.FontSize = 20;
+            app.Label.Position = [15 82 124 44];
+            app.Label.Text = '第1个气球';
+
+            % Create Image
+            app.Image = uiimage(app.Panel_5);
+            app.Image.Position = [145 9 111 117];
+            app.Image.ImageSource = fullfile(pathToMLAPP, '原始气球.png');
+
+            % Create EditField_12
+            app.EditField_12 = uieditfield(app.Panel_5, 'text');
+            app.EditField_12.BackgroundColor = [0.8 0.8 0.8];
+            app.EditField_12.Position = [245 27 99 82];
+
+            % Create Label_2
+            app.Label_2 = uilabel(app.Panel_5);
+            app.Label_2.BackgroundColor = [0.8 0.8 0.8];
+            app.Label_2.FontSize = 20;
+            app.Label_2.Position = [255 32 79 69];
+            app.Label_2.Text = '未充气';
+
+            % Create EditField_13
+            app.EditField_13 = uieditfield(app.UIFigure, 'text');
+            app.EditField_13.HorizontalAlignment = 'center';
+            app.EditField_13.FontSize = 20;
+            app.EditField_13.BackgroundColor = [0.8902 0.9882 1];
+            app.EditField_13.Position = [128 513 188 51];
+            app.EditField_13.Value = '气球状态';
+
+            % Create EditField_14
+            app.EditField_14 = uieditfield(app.UIFigure, 'text');
+            app.EditField_14.HorizontalAlignment = 'center';
+            app.EditField_14.FontSize = 20;
+            app.EditField_14.BackgroundColor = [0.8902 0.9882 1];
+            app.EditField_14.Position = [514 513 188 51];
+            app.EditField_14.Value = '被试决策';
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = app1
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
